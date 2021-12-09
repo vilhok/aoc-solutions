@@ -40,9 +40,11 @@ public class Year2018Day06 extends DayX {
 			int y = l.get(0);
 			Point pnt = new Point(x, y);
 			points.add(pnt);
+			nonInfinite.add(p);
 			map[x][y] = p;
 			p++;
 		}
+		
 
 		for (int x = 0; x < map.length; x++) {
 			for (int y = 0; y < map.length; y++) {
@@ -109,9 +111,7 @@ public class Year2018Day06 extends DayX {
 			int size = calculateAreaWithDistance(new HashSet<Point>(), p.x, p.y, points, 10000);
 			if (theArea == 0) {
 				theArea = size;
-			} else {
-				System.out.println("ERROR: two separate areas!");
-			}
+			} 
 		}
 		return theArea;
 	}
