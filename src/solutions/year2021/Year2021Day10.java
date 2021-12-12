@@ -126,6 +126,8 @@ public class Year2021Day10 extends DayX {
 					throw new IllegalArgumentException("Unexpected value: " + c);
 				}
 			}
+			
+			
 			long score = 0;
 			while (stack.size() != 0) {
 				char c = stack.pop();
