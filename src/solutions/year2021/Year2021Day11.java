@@ -27,7 +27,6 @@ public class Year2021Day11 extends DayX {
 		int[][] octopi = input.intMatrix();
 		int total = 0;
 		for (int i = 0; i < 100; i++) {
-			System.out.println("step " + (i + 1));
 			// increment
 			for (int[] row : octopi) {
 				for (int j = 0; j < row.length; j++) {
@@ -36,13 +35,13 @@ public class Year2021Day11 extends DayX {
 
 			}
 			total += resolveFlashes(octopi, new boolean[10][10]);
-			nollaa(octopi);
+			resetFlashed(octopi);
 		}
 
 		return total;
 	}
 
-	private void nollaa(int[][] octopi){
+	private void resetFlashed(int[][] octopi){
 
 		for (int[] row : octopi) {
 			for (int i = 0; i < row.length; i++) {
@@ -97,12 +96,11 @@ public class Year2021Day11 extends DayX {
 
 	@Override
 	public Object secondPart(InputParser input){
-		int[][] octopi = input.intMatrix();
+		int[][] octopuses = input.intMatrix();
 		int step = 0;
 		for (int i = 0; i < 10000000; i++) {
-			System.out.println("step " + (i + 1));
 			// increment
-			for (int[] row : octopi) {
+			for (int[] row : octopuses) {
 				for (int j = 0; j < row.length; j++) {
 					row[j]++;
 				}
@@ -110,7 +108,7 @@ public class Year2021Day11 extends DayX {
 			}
 			boolean[][] cache = new boolean[10][10];
 
-			resolveFlashes(octopi, cache);
+			resolveFlashes(octopuses, cache);
 			boolean all = true;
 			for (boolean[] row : cache) {
 				for (int j = 0; j < row.length; j++) {
@@ -126,7 +124,7 @@ public class Year2021Day11 extends DayX {
 				break;
 			}
 
-			nollaa(octopi);
+			resetFlashed(octopuses);
 		}
 
 		return step;
