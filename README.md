@@ -14,6 +14,6 @@ I'm using my own [helper library](https://github.com/vilhok/aoc-lib) to fetch in
 
 
 ### A solution does not work?
-Might be an edge-case for some inputs, I've fixed one before. The code was completely broken, but worked by luck. 
+Might be an edge case for some inputs, I've fixed one before. The code was completely broken, but worked by luck. 
 
  Open an issue and I might look into it.
