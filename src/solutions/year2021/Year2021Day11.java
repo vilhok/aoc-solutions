@@ -23,27 +23,25 @@ import com.github.aoclib.solver.DayX;
 public class Year2021Day11 extends DayX {
 
 	@Override
-	public Object firstPart(InputParser input){
-		int[][] octopi = input.intMatrix();
-		int total = 0;
+	public Object firstPart(InputParser input) {
+		int[][] octopuses = input.intMatrix();
+		int totalFlashes = 0;
 		for (int i = 0; i < 100; i++) {
-			// increment
-			for (int[] row : octopi) {
+			for (int[] row : octopuses) {
 				for (int j = 0; j < row.length; j++) {
 					row[j]++;
 				}
 
 			}
-			total += resolveFlashes(octopi, new boolean[10][10]);
-			resetFlashed(octopi);
+			totalFlashes += resolveFlashes(octopuses, new boolean[10][10]);
+			resetFlashed(octopuses);
 		}
 
-		return total;
+		return totalFlashes;
 	}
 
-	private void resetFlashed(int[][] octopi){
-
-		for (int[] row : octopi) {
+	private void resetFlashed(int[][] octopuses) {
+		for (int[] row : octopuses) {
 			for (int i = 0; i < row.length; i++) {
 				if (row[i] > 9) {
 					row[i] = 0;
@@ -52,53 +50,53 @@ public class Year2021Day11 extends DayX {
 		}
 	}
 
-	private int resolveFlashes(int[][] octopi, boolean[][] flashmap){
+	private int resolveFlashes(int[][] octopuses, boolean[][] flashmap) {
 		int flashed = 0;
 
-		for (int i = 0; i < octopi.length; i++) {
-			for (int j = 0; j < octopi.length; j++) {
-				if (octopi[i][j] > 9 && !flashmap[i][j]) {
+		for (int i = 0; i < octopuses.length; i++) {
+			for (int j = 0; j < octopuses.length; j++) {
+				if (octopuses[i][j] > 9 && !flashmap[i][j]) {
 					flashed++;
 					if (i > 0) {
-						octopi[i - 1][j]++;
+						octopuses[i - 1][j]++;
 					}
 					if (j > 0) {
-						octopi[i][j - 1]++;
+						octopuses[i][j - 1]++;
 					}
-					if (i < octopi.length - 1) {
-						octopi[i + 1][j]++;
+					if (i < octopuses.length - 1) {
+						octopuses[i + 1][j]++;
 					}
-					if (j < octopi[0].length - 1) {
-						octopi[i][j + 1]++;
+					if (j < octopuses[0].length - 1) {
+						octopuses[i][j + 1]++;
 					}
 
 					if (i > 0 && j > 0) {
-						octopi[i - 1][j - 1]++;
+						octopuses[i - 1][j - 1]++;
 					}
-					if (i > 0 && j < octopi.length - 1) {
-						octopi[i - 1][j + 1]++;
+					if (i > 0 && j < octopuses.length - 1) {
+						octopuses[i - 1][j + 1]++;
 					}
-					if (j > 0 && i < octopi.length - 1) {
-						octopi[i + 1][j - 1]++;
+					if (j > 0 && i < octopuses.length - 1) {
+						octopuses[i + 1][j - 1]++;
 					}
-					if (i < octopi.length - 1 && j < octopi[0].length - 1) {
-						octopi[i + 1][j + 1]++;
+					if (i < octopuses.length - 1 && j < octopuses[0].length - 1) {
+						octopuses[i + 1][j + 1]++;
 					}
 					flashmap[i][j] = true;
 				}
 			}
 		}
 		if (flashed > 0) {
-			flashed += resolveFlashes(octopi, flashmap);
+			flashed += resolveFlashes(octopuses, flashmap);
 		}
 		return flashed;
 	}
 
 	@Override
-	public Object secondPart(InputParser input){
+	public Object secondPart(InputParser input) {
 		int[][] octopuses = input.intMatrix();
 		int step = 0;
-		for (int i = 0; i < 10000000; i++) {
+		while (true) {
 			// increment
 			for (int[] row : octopuses) {
 				for (int j = 0; j < row.length; j++) {
@@ -119,8 +117,8 @@ public class Year2021Day11 extends DayX {
 				}
 
 			}
+			step++;
 			if (all) {
-				step = i+1;
 				break;
 			}
 
@@ -144,12 +142,12 @@ public class Year2021Day11 extends DayX {
 	 */
 
 	@Override
-	protected void insertTestsPart1(List<Test> tests){
+	protected void insertTestsPart1(List<Test> tests) {
 //		tests.add(new Test("11111\n" + "19991\n" + "19191\n" + "19991\n" + "11111", 0));
 	}
 
 	@Override
-	protected void insertTestsPart2(List<Test> tests){
+	protected void insertTestsPart2(List<Test> tests) {
 
 	}
 }

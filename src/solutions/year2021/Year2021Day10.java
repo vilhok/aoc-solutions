@@ -25,12 +25,13 @@ import com.github.aoclib.solver.DayX;
 public class Year2021Day10 extends DayX {
 
 	@Override
-	public Object firstPart(InputParser input){
+	public Object firstPart(InputParser input) {
 		List<String> lines = input.getLines();
 		int totalErr = 0;
 		for (String s : lines) {
 			ArrayDeque<Character> stack = new ArrayDeque<>();
-			currentLine: for (char c : s.toCharArray()) {
+			currentLine:
+			for (char c : s.toCharArray()) {
 				switch (c) {
 				case '(':
 				case '[':
@@ -80,10 +81,11 @@ public class Year2021Day10 extends DayX {
 	}
 
 	@Override
-	public Object secondPart(InputParser input){
+	public Object secondPart(InputParser input) {
 		List<String> lines = input.getLines();
 		ArrayList<Long> incomplete = new ArrayList<>();
-		nextLine: for (String s : lines) {
+		nextLine:
+		for (String s : lines) {
 			ArrayDeque<Character> stack = new ArrayDeque<>();
 			for (char c : s.toCharArray()) {
 				switch (c) {
@@ -121,13 +123,9 @@ public class Year2021Day10 extends DayX {
 						continue nextLine;
 					}
 					break;
-
-				default:
-					throw new IllegalArgumentException("Unexpected value: " + c);
 				}
 			}
-			
-			
+
 			long score = 0;
 			while (stack.size() != 0) {
 				char c = stack.pop();
@@ -161,7 +159,7 @@ public class Year2021Day10 extends DayX {
 	 */
 
 	@Override
-	protected void insertTestsPart1(List<Test> tests){
+	protected void insertTestsPart1(List<Test> tests) {
 		tests.add(new Test("()", 0));
 		tests.add(new Test("(]", 57));
 		tests.add(new Test("[<>({}){}[([])<>]]", 0));
@@ -172,7 +170,7 @@ public class Year2021Day10 extends DayX {
 	}
 
 	@Override
-	protected void insertTestsPart2(List<Test> tests){
+	protected void insertTestsPart2(List<Test> tests) {
 		tests.add(new Test("[({(<(())[]>[[{[]{<()<>>\n" + "[(()[<>])]({[<{<<[]>>(\n" + "{([(<{}[<>[]}>{[]{[(<()>\n"
 				+ "(((({<>}<{<{<>}{[]{[]{}\n" + "[[<[([]))<([[{}[[()]]]\n" + "[{[{({}]{}}([{[{{{}}([]\n"
 				+ "{<[[]]>}<{[{[{[]{()[[[]\n" + "[<(<(<(<{}))><([]([]()\n" + "<{([([[(<>()){}]>(<<{{\n"

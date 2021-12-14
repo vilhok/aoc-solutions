@@ -222,7 +222,6 @@ public class Year2021Day12 extends DayX {
 
 	@Override
 	public Object firstPart(InputParser input){
-		
 		return buildCave(input).countRoutes();
 	}
 
