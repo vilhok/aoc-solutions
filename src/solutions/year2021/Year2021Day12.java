@@ -4,9 +4,7 @@ import java.util.ArrayDeque;
 import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
-import java.util.Random;
 import java.util.Set;
-import java.util.function.Function;
 
 import com.github.aoclib.api.InputParser;
 import com.github.aoclib.solver.DayX;

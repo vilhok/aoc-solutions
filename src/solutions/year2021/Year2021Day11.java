@@ -1,6 +1,5 @@
 package solutions.year2021;
 
-import java.util.Arrays;
 import java.util.List;
 
 import com.github.aoclib.api.InputParser;
