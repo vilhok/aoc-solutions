@@ -3,7 +3,6 @@ package solutions.year2021;
 import java.util.ArrayList;
 import java.util.Collections;
 import java.util.HashMap;
-import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
 import java.util.stream.Collectors;
@@ -31,8 +30,52 @@ public class Year2021Day14 extends DayX {
 	public Object firstPart(InputParser input) {
 		List<List<String>> grps = input.getGroups();
 
-		StringBuilder polymerTemplate = new StringBuilder(grps.get(0).get(0));
+		StringBuilder originalPolymer = new StringBuilder(grps.get(0).get(0));
 
+		HashMap<String, String> rules = parseRules(grps);
+
+		HashMap<CacheKey, HashMap<Character, Long>> map = new HashMap<>();
+
+		HashMap<Character, Long> result = recursePolymer(map, rules, originalPolymer.toString(), 10);
+
+		char c = originalPolymer.charAt(0);
+		long s = result.get(c);
+		result.put(c, s + 1);
+
+		ArrayList<Long> counts = new ArrayList<>(result.values());
+		Collections.sort(counts);
+		return counts.get(counts.size() - 1) - counts.get(0);
+
+	}
+
+	@Override
+	public Object secondPart(InputParser input) {
+		List<List<String>> grps = input.getGroups();
+
+		StringBuilder originalPolymer = new StringBuilder(grps.get(0).get(0));
+
+		HashMap<String, String> rules = parseRules(grps);
+
+		HashMap<Character, Long> result = recursePolymer(originalPolymer, rules);
+
+		char c = originalPolymer.charAt(0);
+		long s = result.get(c);
+		result.put(c, s + 1);
+
+		ArrayList<Long> longs = new ArrayList<>(result.values());
+		Collections.sort(longs);
+		return longs.get(longs.size() - 1) - longs.get(0);
+	}
+
+	private HashMap<Character, Long> recursePolymer(StringBuilder originalPolymer,
+			HashMap<String, String> polymerReplace) {
+
+		HashMap<CacheKey, HashMap<Character, Long>> cache = new HashMap<>();
+		return recursePolymer(cache, polymerReplace, originalPolymer.toString(), 40);
+
+	}
+
+	private HashMap<String, String> parseRules(List<List<String>> grps) {
 		HashMap<String, String> polymerReplace = new HashMap<>();
 
 		for (String s : grps.get(1)) {
@@ -40,71 +83,20 @@ public class Year2021Day14 extends DayX {
 			String result = sides[1];
 			polymerReplace.put(sides[0], result);
 		}
-
-		record Insert(int index, String value) implements Comparable<Insert> {
-
-			@Override
-			public int compareTo(Insert o) {
-				return Integer.compare(this.index, o.index);
-			}
-		}
-
-		for (int i = 0; i < 10; i++) {
-			ArrayList<Insert> inserts = new ArrayList<>();
-
-			for (String s : polymerReplace.keySet()) {
-				int startIndex = 0;
-				do {
-					int next = polymerTemplate.indexOf(s, startIndex);
-					if (next != -1) {
-						inserts.add(
-							new Insert(next + 1, polymerReplace.get(s)));
-						startIndex = next + 1;
-					} else {
-						startIndex = next;
-					}
-
-				} while (startIndex != -1);
-			}
-
-			Collections.sort(inserts, Collections.reverseOrder());
-			System.out.println("before: " + polymerTemplate);
-			for (Insert ch : inserts) {
-				polymerTemplate.insert(ch.index, ch.value);
-//				System.out.println(ch);
-			}
-			System.out.println("after:  " + polymerTemplate);
-
-		}
-		return getCount(polymerTemplate);
-
+		return polymerReplace;
 	}
 
-	private long getCount(StringBuilder polymerTemplate) {
-		ArrayList<Integer> counts = new ArrayList<>();
-
-		Set<Character> chars = polymerTemplate.chars().mapToObj(i -> (char) i)
-				.collect(Collectors.toSet());
-
-		char[] polymer = polymerTemplate.toString().toCharArray();
-		for (char c : chars) {
-			int count = 0;
-			for (char p : polymer) {
-				if (c == p)
-					count++;
-			}
-			counts.add(count);
-		}
-
-		Collections.sort(counts);
-		return counts.get(counts.size() - 1) - counts.get(0);
-
-	}
-
+	/**
+	 * Counts how many characters exist in a specific template.
+	 * @param polymerTemplate
+	 * @return
+	 */
 	private HashMap<Character, Long> getCounts(String polymerTemplate) {
 		HashMap<Character, Long> map = new HashMap<>();
-		Set<Character> chars = polymerTemplate.chars().mapToObj(i -> (char) i)
-				.collect(Collectors.toSet());
+		/**
+		 * Would be great to parse all the available characters just once.
+		 */
+		Set<Character> chars = polymerTemplate.chars().mapToObj(i -> (char) i).collect(Collectors.toSet());
 
 		char[] polymer = polymerTemplate.toString().toCharArray();
 		for (char c : chars) {
@@ -121,14 +113,9 @@ public class Year2021Day14 extends DayX {
 
 	}
 
-	record Iteration(String polymer, Integer round) {
-
-	}
-
-	public void insertPolymers(StringBuilder og,
-			HashMap<String, String> polymerReplace) {
+	public void insertPolymers(StringBuilder og, HashMap<String, String> polymerReplace) {
+		//
 		record Insert(int index, String value) implements Comparable<Insert> {
-
 			@Override
 			public int compareTo(Insert o) {
 				return Integer.compare(this.index, o.index);
@@ -152,114 +139,63 @@ public class Year2021Day14 extends DayX {
 		}
 
 		Collections.sort(inserts, Collections.reverseOrder());
-//		System.out.println("before: " + og);
 		for (Insert ch : inserts) {
 			og.insert(ch.index, ch.value);
-//			System.out.println(ch);
 		}
-//		System.out.println("after:  " + og);
 	}
 
-	public HashMap<Character, Long> recursePolymer(
-			HashMap<Iteration, HashMap<Character, Long>> map,
-			HashMap<String, String> polymerReplace, String polymer,
-			int roundLimit) {
+	/**
+	 * represent a cache entry with a specific polymer adter N rounds of iteration
+	 */
+	record CacheKey(String polymer, Integer afterNrounds) {
 
-		System.out.println("round " + round + " original: " + polymer);
+	}
 
-		if (round == roundLimit) {
-			Iteration piece = new Iteration(polymer, round);
-			StringBuilder finalPoly = new StringBuilder(polymer);
-			finalPoly.insert(1, polymerReplace.get(polymer));
-			HashMap<Character, Long> h = getCounts(finalPoly.substring(1));
-			System.out.println("final level, saving!");
-			System.out.println(piece + " " + h + " " + finalPoly);
-			map.put(piece, h);
-			return h;
+	public HashMap<Character, Long> recursePolymer(HashMap<CacheKey, HashMap<Character, Long>> cache,
+			HashMap<String, String> rules, String polymer, int round) {
 
+		CacheKey piece = new CacheKey(polymer, round);
+
+		if (cache.containsKey(piece)) {
+			return cache.get(piece);
 		}
+
 		StringBuilder poly = new StringBuilder(polymer);
-		insertPolymers(poly, polymerReplace);
-		System.out.println(" Reacted:" + poly + " recursing...");
-		HashMap<Character, Long> finalCounts = new HashMap<Character, Long>();
+		insertPolymers(poly, rules);
 
-		for (int i = 0; i < poly.length() - 2; i++) {
-			String s = poly.substring(i, i + 2);
-
-			Iteration piece = new Iteration(s, roundLimit);
-			if (map.containsKey(piece)) {
-				System.out.println("This count was known");
-				System.out.println(map.get(piece));
-			} else {
-				HashMap<Character, Long> ch = recursePolymer(
-					map, polymerReplace, s, roundLimit - 1);
-				System.out.println("piece " + piece + " completed");
-				System.out.println(ch);
-				;
-				map.put(piece, ch);
-
-			}
-			mergeMaps(finalCounts, map.get(piece));
-			System.out
-					.println("Subpolymer " + s + " has result " + finalCounts);
+		if (round == 1) {
+			HashMap<Character, Long> h = getCounts(poly.substring(1));
+			cache.put(piece, h);
+			return h;
 		}
-		return finalCounts;
+
+		round--;
+
+		HashMap<Character, Long> totals = new HashMap<Character, Long>();
+
+		for (int i = 0; i < poly.length() - 1; i++) {
+			String pair = poly.substring(i, i + 2);
+			CacheKey segment = new CacheKey(pair, round);
+
+			if (!cache.containsKey(segment)) {
+				cache.put(segment, recursePolymer(cache, rules, pair, round));
+			}
+
+			mergeMaps(totals, cache.get(segment));
+		}
+		return totals;
 	}
 
-	private void mergeMaps(HashMap<Character, Long> destination,
-			HashMap<Character, Long> source) {
-
+	/*
+	 * adds the values from the source hashmap to the values in the destination map
+	 */
+	private void mergeMaps(HashMap<Character, Long> destination, HashMap<Character, Long> source) {
 		for (Character c : source.keySet()) {
 			Long count = source.get(c);
 			Long original = destination.getOrDefault(c, 0L);
 			destination.put(c, count + original);
 		}
 
-	}
-
-	@Override
-	public Object secondPart(InputParser input) {
-		/**
-		 * Do as follows:
-		 * 
-		 * Recurse a single pair.<br>
-		 * Check, if exists:<br>
-		 * - Result set for a pair after N iterations<br>
-		 * - if yes, add the counts to the totals.<br>
-		 * - if no, recurse a pair<br>
-		 * <br>
-		 * - all that is needed should be: every pair in a hashmap, for every
-		 * count. 40 rounds x 100 polymer rules
-		 * 
-		 * 
-		 * 
-		 * 
-		 */
-		List<List<String>> grps = input.getGroups();
-
-		StringBuilder polymerTemplate = new StringBuilder(grps.get(0).get(0));
-
-		HashMap<String, String> polymerReplace = new HashMap<>();
-
-		for (String s : grps.get(1)) {
-			String[] sides = s.split(" -> ");
-			String result = sides[1];
-			polymerReplace.put(sides[0], result);
-		}
-
-		HashMap<Iteration, HashMap<Character, Long>> map = new HashMap<>();
-
-		HashMap<Character, Long> result = recursePolymer(
-			map, polymerReplace, polymerTemplate.toString(), 3);
-
-		char c = polymerTemplate.charAt(0);
-		long s = result.get(c);
-		result.put(c, s + 1);
-
-		ArrayList<Long> longs = new ArrayList<>(result.values());
-		Collections.sort(longs);
-		System.out.println(longs);
-		return NOT_SOLVED;
 	}
 
 	/*
@@ -277,44 +213,6 @@ public class Year2021Day14 extends DayX {
 
 	@Override
 	protected void insertTestsPart1(List<Test> tests) {
-		tests.add(new Test("""
-				NN
-
-				CH -> B
-				HH -> N
-				CB -> H
-				NH -> C
-				HB -> C
-				HC -> B
-				HN -> C
-				NN -> C
-				BH -> H
-				NC -> B
-				NB -> B
-				BN -> B
-				BB -> N
-				BC -> B
-				CC -> N
-				CN -> C""", 517));
-		tests.add(new Test("""
-				NNC
-
-				CH -> B
-				HH -> N
-				CB -> H
-				NH -> C
-				HB -> C
-				HC -> B
-				HN -> C
-				NN -> C
-				BH -> H
-				NC -> B
-				NB -> B
-				BN -> B
-				BB -> N
-				BC -> B
-				CC -> N
-				CN -> C""", 1199));
 		tests.add(new Test("""
 				NNCB
 
@@ -339,25 +237,6 @@ public class Year2021Day14 extends DayX {
 
 	@Override
 	protected void insertTestsPart2(List<Test> tests) {
-		tests.add(new Test("""
-				NN
-
-				CH -> B
-				HH -> N
-				CB -> H
-				NH -> C
-				HB -> C
-				HC -> B
-				HN -> C
-				NN -> C
-				BH -> H
-				NC -> B
-				NB -> B
-				BN -> B
-				BB -> N
-				BC -> B
-				CC -> N
-				CN -> C""", 2188189693529L));
 		tests.add(new Test("""
 				NNCB
 

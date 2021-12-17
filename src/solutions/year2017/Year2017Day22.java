@@ -9,47 +9,7 @@ import com.github.aoclib.solver.DayX;
 
 public class Year2017Day22 extends DayX {
 
-	class Point {
-		int x;
-		int y;
-
-		public Point(int x, int y) {
-			super();
-			this.x = x;
-			this.y = y;
-		}
-
-		@Override
-		public int hashCode() {
-			final int prime = 31;
-			int result = 1;
-			result = prime * result + getEnclosingInstance().hashCode();
-			result = prime * result + x;
-			result = prime * result + y;
-			return result;
-		}
-
-		@Override
-		public boolean equals(Object obj) {
-			if (this == obj)
-				return true;
-			if (obj == null)
-				return false;
-			if (getClass() != obj.getClass())
-				return false;
-			Point other = (Point) obj;
-			if (!getEnclosingInstance().equals(other.getEnclosingInstance()))
-				return false;
-			if (x != other.x)
-				return false;
-			if (y != other.y)
-				return false;
-			return true;
-		}
-
-		private Year2017Day22 getEnclosingInstance() {
-			return Year2017Day22.this;
-		}
+	record Point(int x, int y) {
 
 	}
 
@@ -60,12 +20,10 @@ public class Year2017Day22 extends DayX {
 		int dx;
 		int dy;
 
-		
 		private Direction(int dx, int dy) {
 			this.dx = dx;
 			this.dy = dy;
 		}
-
 	}
 
 	@Override
