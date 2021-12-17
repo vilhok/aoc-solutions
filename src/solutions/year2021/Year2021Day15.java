@@ -1,10 +1,14 @@
 package solutions.year2021;
 
-import java.util.ArrayDeque;
+import java.util.Comparator;
 import java.util.List;
+import java.util.PriorityQueue;
 
 import com.github.aoclib.api.InputParser;
 import com.github.aoclib.solver.DayX;
+
+import utils.Point;
+import utils.Utils;
 
 /**
  * <p>
@@ -27,16 +31,7 @@ public class Year2021Day15 extends DayX {
 		int[][] values = input.intMatrix();
 		int[][] costs = new int[values.length][values[0].length];
 		boolean[][] visited = new boolean[values.length][values[0].length];
-
-		for (int[] row : costs) {
-			for (int i = 0; i < row.length; i++) {
-				row[i] = Integer.MAX_VALUE;
-			}
-		}
-
-		costs[0][0] = 0;
-		cheapestRoute(values, visited, costs, 0, 0);
-
+		calculateRouteCosts(values, visited, costs, 0, 0);
 		return costs[values.length - 1][values[0].length - 1];
 	}
 
@@ -62,8 +57,8 @@ public class Year2021Day15 extends DayX {
 			}
 		}
 
-		costs[0][0]=0;
-		cheapestRoute(realmap, visited, costs, 0, 0);
+		costs[0][0] = 0;
+		calculateRouteCosts(realmap, visited, costs, 0, 0);
 
 		return costs[realmap.length - 1][realmap[0].length - 1];
 	}
@@ -81,86 +76,45 @@ public class Year2021Day15 extends DayX {
 
 	}
 
-	record Point(int x, int y) {
-	}
-	
-	
-	//dijkstra
-	public void cheapestRoute(int[][] values, boolean[][] visited, int[][] costs, int initialx, int initialy) {
+	// dijkstra
+	public void calculateRouteCosts(int[][] values, boolean[][] visited, int[][] costs, int initialx, int initialy) {
 
-		ArrayDeque<Point> queue = new ArrayDeque<>();
+		Comparator<Point> comp = (a, b) -> Integer.compare(costs[a.y()][a.x()], costs[b.y()][b.x()]);
+
+		PriorityQueue<Point> queue = new PriorityQueue<>(comp);
 
 		queue.add(new Point(initialx, initialy));
 
+		List<Point> neighbors = Utils.fourNeighbors();
+
 		while (!queue.isEmpty()) {
-			Point p = findMin(queue, costs);
 
+			Point current = queue.poll();
 
-			if (p.x < 0 || p.y < 0 || p.x == values[0].length || p.y == values.length) {
-
+			if (current.x() < 0 || current.y() < 0 || current.x() == values[0].length || current.y() == values.length) {
 				continue;
 			}
-			if (visited[p.y][p.x]) {
+			if (visited[current.y()][current.x()]) {
 				continue;
 			}
 
-			
-			if (boundcheck(p.x + 1, p.y, costs)) {
-				int newcost = costs[p.y][p.x] + values[p.y][p.x + 1];
-				if (newcost <= costs[p.y][p.x + 1]) {
-					costs[p.y][p.x + 1] = newcost;
+			for (Point delta : neighbors) {
+				int x = current.x() + delta.x();
+				int y = current.y() + delta.y();
+				if (boundcheck(x, y, costs)) {
+					int newcost = costs[current.y()][current.x()] + values[y][x];
+					if (costs[y][x] == 0 || newcost <= costs[y][x]) {
+						costs[y][x] = newcost;
+					}
+					if (!visited[y][x]) {
+						queue.add(new Point(x, y));
+					}
 				}
 			}
-			if (boundcheck(p.x - 1, p.y, costs)) {
-				int newcost = costs[p.y][p.x] + values[p.y][p.x - 1];
-				if (newcost <= costs[p.y][p.x - 1]) {
-					costs[p.y][p.x - 1] = newcost;
-				}
-			}
-			if (boundcheck(p.x, p.y + 1, costs)) {
-				int newcost = costs[p.y][p.x] + values[p.y + 1][p.x];
-				if (newcost <= costs[p.y + 1][p.x]) {
-					costs[p.y + 1][p.x] = newcost;
-				}
-			}
+			visited[current.y()][current.x()] = true;
 
-			if (boundcheck(p.x, p.y - 1, costs)) {
-				int newcost = costs[p.y][p.x] + values[p.y - 1][p.x];
-				if (newcost <= costs[p.y - 1][p.x]) {
-					costs[p.y - 1][p.x] = newcost;
-				}
-			}
-
-			visited[p.y][p.x] = true;
-
-			if (boundcheck(p.x + 1, p.y, costs) && !visited[p.y][p.x + 1]) {
-				queue.add(new Point(p.x + 1, p.y));
-			}
-			if (boundcheck(p.x - 1, p.y, costs) && !visited[p.y][p.x - 1]) {
-				queue.add(new Point(p.x - 1, p.y));
-			}
-			if (boundcheck(p.x, p.y + 1, costs) && !visited[p.y + 1][p.x]) {
-				queue.add(new Point(p.x, p.y + 1));
-			}
-			if (boundcheck(p.x, p.y - 1, costs) && !visited[p.y - 1][p.x]) {
-				queue.add(new Point(p.x, p.y - 1));
-			}
 		}
 
-	}
-
-	
-	
-	
-	private Point findMin(ArrayDeque<Point> queue, int[][] costs) {
-		Point min = queue.peek();
-		for (Point p : queue) {
-			if (costs[min.y][min.x] > costs[p.y][p.x]) {
-				min = p;
-			}
-		}
-		queue.remove(min);
-		return min;
 	}
 
 	public boolean boundcheck(int x, int y, int[][] table) {
@@ -210,11 +164,6 @@ public class Year2021Day15 extends DayX {
 
 	@Override
 	protected void insertTestsPart2(List<Test> tests) {
-//		tests.add(new Test("""
-//				123
-//				456
-//				789
-//				""", 5));
 		tests.add(new Test("""
 				1163751742
 				1381373672
