@@ -67,7 +67,6 @@ public class Year2021Day16 extends DayX {
 		}
 
 		public Node fromToken(Token t) {
-			System.out.println(t);
 			return switch (t.type) {
 			case GT, LT, EQ -> new BinaryNode(t);
 			case LITERAL -> new LiteralNode(t);
@@ -167,7 +166,8 @@ public class Year2021Day16 extends DayX {
 						n.build(tokens);
 					}
 				} else {
-					//build tokens until a childnode is at the end the subTokenEnd value
+					// build tokens until a childnode is at the end the
+					// subTokenEnd value
 					do {
 						Node n = fromToken(tokens.poll());
 						n.build(tokens);
@@ -204,7 +204,7 @@ public class Year2021Day16 extends DayX {
 					return children.stream().mapToLong(Node::value)
 							.reduce(1, (a, b) -> a * b);
 				default:
-					//for getting rid of the warning.
+					// for getting rid of the warning.
 					throw new RuntimeException("invalid operation");
 
 				}
@@ -239,13 +239,6 @@ public class Year2021Day16 extends DayX {
 	enum Operation {
 		SUM, PRODUCT, MIN, MAX, LITERAL, GT, LT, EQ;
 
-	}
-
-	@Override
-	public Object firstPart(InputParser input) {
-		ArrayList<Token> tokens = parseNodes(input);
-		tokens.forEach(System.out::println);
-		return tokens.stream().mapToInt(Token::version).sum();
 	}
 
 	private ArrayList<Token> parseNodes(InputParser input) {
@@ -311,6 +304,12 @@ public class Year2021Day16 extends DayX {
 		long l = Long.parseLong(literal.toString(), 2);
 		target.literal = l;
 		return end;
+	}
+
+	@Override
+	public Object firstPart(InputParser input) {
+		ArrayList<Token> tokens = parseNodes(input);
+		return tokens.stream().mapToInt(Token::version).sum();
 	}
 
 	@Override
