@@ -24,19 +24,25 @@ import com.github.aoclib.solver.DayX;
  *
  */
 public class Year2021Day16 extends DayX {
+	/**
+	 * Represents node calculation type
+	 */
+	private enum Operation {
+		SUM, PRODUCT, MIN, MAX, LITERAL, GT, LT, EQ;
 
-	class Token {
-		int version;
-		Operation type;
+	}
 
-		int tokenStart;
-		int tokenEnd;
-
-		long literal;
-
-		int subtokenCount;
-
-		int subTokenEnd;
+	/**
+	 * A Token parsed from the binary stream
+	 */
+	private class Token {
+		private int version;
+		private Operation type;
+		private int tokenStart;
+		private int tokenEnd;
+		private long literal;
+		private int subtokenCount;
+		private int subTokenEnd;
 
 		public Token(int version, int type) {
 			super();
@@ -50,16 +56,15 @@ public class Year2021Day16 extends DayX {
 
 		@Override
 		public String toString() {
-			return "Token [version=" + version + ", type=" + type
-					+ ", tokenStart=" + tokenStart + ", tokenEnd=" + tokenEnd
-					+ ", literal=" + literal + ", subtokenCount="
-					+ subtokenCount + ", subTokenEnd=" + subTokenEnd + "]";
+			return "Token [version=" + version + ", type=" + type + ", tokenStart=" + tokenStart + ", tokenEnd="
+					+ tokenEnd + ", literal=" + literal + ", subtokenCount=" + subtokenCount + ", subTokenEnd="
+					+ subTokenEnd + "]";
 		}
 	}
 
 	class ExprTree {
 
-		Node root;
+		private Node root;
 
 		public ExprTree(ArrayDeque<Token> tokens) {
 			root = fromToken(tokens.poll());
@@ -68,9 +73,9 @@ public class Year2021Day16 extends DayX {
 
 		public Node fromToken(Token t) {
 			return switch (t.type) {
-			case GT, LT, EQ -> new BinaryNode(t);
-			case LITERAL -> new LiteralNode(t);
-			case SUM, PRODUCT, MIN, MAX -> new MultiNode(t);
+				case GT, LT, EQ -> new BinaryNode(t);
+				case LITERAL -> new LiteralNode(t);
+				case SUM, PRODUCT, MIN, MAX -> new MultiNode(t);
 			};
 
 		}
@@ -79,7 +84,7 @@ public class Year2021Day16 extends DayX {
 			return root.value();
 		}
 
-		abstract class Node {
+		private abstract class Node {
 			Operation op;
 			Token token;
 
@@ -96,10 +101,10 @@ public class Year2021Day16 extends DayX {
 
 		}
 
-		class BinaryNode extends Node {
+		private class BinaryNode extends Node {
 
-			Node left;
-			Node right;
+			private Node left;
+			private Node right;
 
 			public BinaryNode(Token t) {
 				super(t);
@@ -116,8 +121,7 @@ public class Year2021Day16 extends DayX {
 			}
 
 			/**
-			 * Reports the node that is futhest away in the string
-			 * representation
+			 * Reports the node that is futhest away in the string representation
 			 */
 			public int maxEnd() {
 				if (left == null && right == null) {
@@ -133,24 +137,24 @@ public class Year2021Day16 extends DayX {
 			 */
 			public long value() {
 				switch (op) {
-				case GT: {
-					return left.value() > right.value() ? 1 : 0;
-				}
-				case LT: {
-					return left.value() < right.value() ? 1 : 0;
-				}
-				case EQ: {
-					return left.value() == right.value() ? 1 : 0;
-				}
-				default:
-					throw new RuntimeException("invalid operation");
+					case GT: {
+						return left.value() > right.value() ? 1 : 0;
+					}
+					case LT: {
+						return left.value() < right.value() ? 1 : 0;
+					}
+					case EQ: {
+						return left.value() == right.value() ? 1 : 0;
+					}
+					default:
+						throw new RuntimeException("invalid operation");
 				}
 
 			}
 		}
 
-		class MultiNode extends Node {
-			ArrayList<Node> children;
+		private class MultiNode extends Node {
+			private ArrayList<Node> children;
 
 			public MultiNode(Token t) {
 				super(t);
@@ -192,27 +196,27 @@ public class Year2021Day16 extends DayX {
 
 			public long value() {
 				switch (op) {
-				case MIN:
-					return children.stream().mapToLong(Node::value).min()
-							.getAsLong();
-				case MAX:
-					return children.stream().mapToLong(Node::value).max()
-							.getAsLong();
-				case SUM:
-					return children.stream().mapToLong(Node::value).sum();
-				case PRODUCT:
-					return children.stream().mapToLong(Node::value)
-							.reduce(1, (a, b) -> a * b);
-				default:
-					// for getting rid of the warning.
-					throw new RuntimeException("invalid operation");
-
+					case MIN:
+						return children.stream().mapToLong(Node::value).min().getAsLong();
+					case MAX:
+						return children.stream().mapToLong(Node::value).max().getAsLong();
+					case SUM:
+						return children.stream().mapToLong(Node::value).sum();
+					case PRODUCT:
+						return children.stream().mapToLong(Node::value).reduce(1, (a, b) -> a * b);
+					default:
+						// for getting rid of the warning.
+						throw new RuntimeException("invalid operation");
 				}
-
 			}
 		}
 
-		class LiteralNode extends Node {
+		/**
+		 * A node with a literal value
+		 */
+		private class LiteralNode extends Node {
+
+			private long value;
 
 			public LiteralNode(Token t) {
 				super(t);
@@ -223,8 +227,6 @@ public class Year2021Day16 extends DayX {
 				// nop
 			}
 
-			long value;
-
 			public long value() {
 				return value;
 			}
@@ -233,11 +235,6 @@ public class Year2021Day16 extends DayX {
 				return token.tokenEnd;
 			}
 		}
-
-	}
-
-	enum Operation {
-		SUM, PRODUCT, MIN, MAX, LITERAL, GT, LT, EQ;
 
 	}
 
