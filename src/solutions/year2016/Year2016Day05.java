@@ -47,16 +47,21 @@ public class Year2016Day05 extends DayX {
 			e.printStackTrace();
 		}
 		char[] chrs = "0123456789abcdef".toCharArray();
-		
+
 		int i = 0;
 		while (sb.chars().anyMatch(ch -> ch == '_')) {
 			int val = i++;
 			byte[] bytes = mesg.digest((s + val).getBytes(Charset.forName("UTF-8")));
 
 			if ((bytes[0] == 0 && bytes[1] == 0 && (bytes[2] & 0xf0) == 0)) {
-				int position = bytes[2] & 0xf;
+				int position = bytes[2] & 0x0f;
 				if (position < 8 && sb.charAt(position) == '_') {
-					sb.setCharAt(position, chrs[position]);
+					int p = (bytes[3] & 0xf0) >> 4;
+					System.err.println(bytes[3]);
+					System.out.println(bytes[3] & 0xf0);
+					System.out.println(bytes[3] & 0xf0 >> 4);
+					System.out.println(p);
+					sb.setCharAt(position, chrs[p]);
 
 				}
 			}
