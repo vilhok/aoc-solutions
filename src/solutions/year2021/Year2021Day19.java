@@ -4,6 +4,7 @@ import java.util.ArrayList;
 import java.util.HashSet;
 import java.util.List;
 import java.util.Set;
+import java.util.stream.Collectors;
 
 import com.github.aoclib.api.InputParser;
 import com.github.aoclib.solver.DayX;
@@ -97,15 +98,15 @@ public class Year2021Day19 extends DayX {
 	}
 
 	class Vector {
-		int i;
-		int j;
-		int k;
+		private int i;
+		private int j;
+		private int k;
 
-		Point3D p1;
-		Point3D p2;
+		private Point3D p1;
+		private Point3D p2;
 
-		Point3D unrotatedP1;
-		Point3D unrotatedP2;
+		private Point3D unrotatedP1;
+		private Point3D unrotatedP2;
 
 		public Vector(Point3D p1, Point3D p2) {
 			i = p1.x - p2.x;
@@ -182,8 +183,8 @@ public class Year2021Day19 extends DayX {
 			Rotations.rotatePoints(mutableBeacons, rotM);
 		}
 
-		public List<Vector> vectorizePoints() {
-			ArrayList<Vector> v = new ArrayList<>();
+		public Set<Vector> vectorizePoints() {
+			Set<Vector> v = new HashSet<>();
 			for (int i = 0; i < mutableBeacons.size(); i++) {
 				for (int j = i + 1; j < mutableBeacons.size(); j++) {
 					Vector vec = new Vector(mutableBeacons.get(i), mutableBeacons.get(j));
@@ -229,21 +230,23 @@ public class Year2021Day19 extends DayX {
 			scanners.add(parseScanner(scanner));
 		}
 
+		Set<Vector> S0V = S0.vectorizePoints();
 		do {
 			Scanner SX = scanners.remove(0);
-			if (overlaps(S0, SX)) {
-				List<Vector> S0V = S0.vectorizePoints();
-				List<Vector> SXV = SX.vectorizePoints();
+			if (overlaps(S0V, SX)) {
 
-				List<MatchingPoints> mp = getVectorData(S0V, SXV);
-				Point3D diff = subVect(mp.get(0).o1, mp.get(0).o2);
+				Set<Vector> SXV = SX.vectorizePoints();
+
+				List<MatchingPoints> mp = getMathcingPoints(S0V, SXV);
+				Point3D diff = subVect(mp.get(0).originalSetPoint, mp.get(0).rotatedPoint);
 				for (Point3D px : SX.mutableBeacons) {
 
 					Point3D newpoint = px.add(diff);
 					S0.addPoint(newpoint);
 				}
-				SX.realLocation = diff;// ?
+				SX.realLocation = diff;
 				part2resultScanners.add(SX);
+				S0V = S0.vectorizePoints();
 			} else {
 				scanners.add(SX);
 			}
@@ -259,8 +262,7 @@ public class Year2021Day19 extends DayX {
 	 * @param s2 this will be rotated to every direction
 	 * @return true if 12 or more common points
 	 */
-	public boolean overlaps(Scanner s1, Scanner s2) {
-		List<Vector> original = s1.vectorizePoints();
+	public boolean overlaps(Set<Vector> original, Scanner s2) {
 
 		// this does up to 4*4*4= 64 rotations which is inefficient. On the other hand,
 		// it will stop when it finds the first.
@@ -278,8 +280,8 @@ public class Year2021Day19 extends DayX {
 					for (int a = 0; a < k; a++) {
 						s2.rotatePoints(Matrix.ROT90_Z);
 					}
-					List<Vector> s2Vectors = s2.vectorizePoints();
-					List<Vector> result = sameVectors(original, s2Vectors);
+					Set<Vector> s2Vectors = s2.vectorizePoints();
+					Set<Vector> result = sameVectors(original, s2Vectors);
 
 					// the tasks states that 12 points overlap between scanners.
 					// because scanners point sets are often merged, we might have more than 12
@@ -298,26 +300,26 @@ public class Year2021Day19 extends DayX {
 		return new Point3D(o1.x - o2.x, o1.y - o2.y, o1.z - o2.z);
 	}
 
-	public List<Vector> sameVectors(List<Vector> a, List<Vector> b) {
-		List<Vector> n = a.stream().filter(b::contains).toList();
+	public Set<Vector> sameVectors(Set<Vector> a, Set<Vector> b) {
+		Set<Vector> n = a.stream().filter(b::contains).collect(Collectors.toSet());
 		return n;
 	}
 
-	record MatchingPoints(Point3D o1, Point3D o2, Point3D o1u) {
+	record MatchingPoints(Point3D originalSetPoint, Point3D rotatedPoint) {
 	}
 
-	public List<MatchingPoints> getVectorData(List<Vector> originalVectors, List<Vector> rotatedVectors) {
+	public List<MatchingPoints> getMathcingPoints(Set<Vector> originalVectors, Set<Vector> rotatedVectors) {
 		List<MatchingPoints> v1 = new ArrayList<MatchingPoints>();
 		Set<Point3D> duplicates = new HashSet<>();
 		for (Vector scanner0Point : originalVectors) {
 			for (Vector rotatedScanner : rotatedVectors) {
 				if (scanner0Point.equals(rotatedScanner) && !duplicates.contains(scanner0Point.p1)) {
-					v1.add(new MatchingPoints(scanner0Point.p1, rotatedScanner.p1, rotatedScanner.unrotatedP1));
+					v1.add(new MatchingPoints(scanner0Point.p1, rotatedScanner.p1));
 					duplicates.add(scanner0Point.p1);
 				}
 
 				if (scanner0Point.equals(rotatedScanner) && !duplicates.contains(scanner0Point.p2)) {
-					v1.add(new MatchingPoints(scanner0Point.p2, rotatedScanner.p2, rotatedScanner.unrotatedP2));
+					v1.add(new MatchingPoints(scanner0Point.p2, rotatedScanner.p2));
 					duplicates.add(scanner0Point.p2);
 				}
 			}
