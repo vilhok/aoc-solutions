@@ -96,7 +96,7 @@ public class Year2021Day18 extends DayX {
 			}
 			if (leftsplit)
 				return leftsplit;
-			
+
 			if (!(right instanceof SnailFishNumber)) {
 				long val = right.longValue();
 				if (val >= 10) {
@@ -138,7 +138,7 @@ public class Year2021Day18 extends DayX {
 				}
 				return true;
 			}
-			
+
 			boolean leftExplode = false;
 			if (left instanceof SnailFishNumber l) {
 				leftExplode = l.explode(depth + 1, this);
@@ -214,24 +214,6 @@ public class Year2021Day18 extends DayX {
 			}
 		}
 
-		public long magnitude() {
-			long magnitude = 0;
-
-			if (left instanceof SnailFishNumber s) {
-				magnitude += s.magnitude() * 3;
-			} else {
-				magnitude += left.longValue() * 3;
-			}
-
-			if (right instanceof SnailFishNumber s) {
-				magnitude += s.magnitude() * 2;
-			} else {
-				magnitude += right.longValue() * 2;
-			}
-
-			return magnitude;
-		}
-
 		@Override
 		public String toString() {
 			return "[" + left + "," + right + "]";
@@ -239,22 +221,25 @@ public class Year2021Day18 extends DayX {
 
 		@Override
 		public int intValue() {
-			throw new UnsupportedOperationException("SnailFishNumber does not have a meaningful intValue");
+			return (int) longValue();
 		}
 
+		/**
+		 * Represents the magnitude of this snailfish number.
+		 */
 		@Override
 		public long longValue() {
-			throw new UnsupportedOperationException("SnailFishNumber does not have a meaningful longValue");
+			return left.longValue() * 3 + right.longValue() * 2;
 		}
 
 		@Override
 		public float floatValue() {
-			throw new UnsupportedOperationException("SnailFishNumber does not have a meaningful floatValue");
+			return longValue();
 		}
 
 		@Override
 		public double doubleValue() {
-			throw new UnsupportedOperationException("SnailFishNumber does not have a meaningful doubleValue");
+			return longValue();
 		}
 
 	}
@@ -267,7 +252,7 @@ public class Year2021Day18 extends DayX {
 			base = base.add(number);
 			base.reduce();
 		}
-		return base.magnitude();
+		return base.longValue();
 	}
 
 	public SnailFishNumber parseNumber(String s) {
@@ -303,7 +288,7 @@ public class Year2021Day18 extends DayX {
 					continue;
 				SnailFishNumber n = a.copy().add(b.copy());
 				n.reduce();
-				long m = n.magnitude();
+				long m = n.longValue();
 				if (m > largest)
 					largest = m;
 			}
