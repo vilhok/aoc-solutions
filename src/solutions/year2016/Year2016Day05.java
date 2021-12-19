@@ -57,12 +57,7 @@ public class Year2016Day05 extends DayX {
 				int position = bytes[2] & 0x0f;
 				if (position < 8 && sb.charAt(position) == '_') {
 					int p = (bytes[3] & 0xf0) >> 4;
-					System.err.println(bytes[3]);
-					System.out.println(bytes[3] & 0xf0);
-					System.out.println(bytes[3] & 0xf0 >> 4);
-					System.out.println(p);
 					sb.setCharAt(position, chrs[p]);
-
 				}
 			}
 		}
