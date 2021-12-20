@@ -50,7 +50,7 @@ public class Year2021Day20 extends DayX {
 		final int originalMaxY = data.size();
 
 		// the range should have twice as much extra.
-		// because 111111111 turns to '#', the borders are filled by gibberish
+		// because 000000000 turns to '#', the borders are filled by gibberish
 		// for having 'rounds' as much extra around the borders, after simulating
 		// 'rounds' many rounds, the gibberish has propagated to the border of the
 		// actual zone.
