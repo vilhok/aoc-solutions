@@ -59,7 +59,6 @@ public class Year2021Day20 extends DayX {
 		int miny = originalMinY - rounds * 2;
 		int maxx = originalMaxX + rounds * 2;
 		int maxy = originalMaxY + rounds * 2;
-
 		for (int i = 0; i < rounds; i++) {
 			HashMap<Point, Integer> updatedmap = new HashMap<>();
 
@@ -69,8 +68,8 @@ public class Year2021Day20 extends DayX {
 					List<Point> nine = Utils.nineNeighbors();
 
 					StringBuilder sb = new StringBuilder();
-					for (Point neigbor : nine) {
-						sb.append(map.getOrDefault(p.add(neigbor), 0));
+					for (Point neighbor : nine) {
+						sb.append(map.getOrDefault(p.add(neighbor), 0));
 					}
 
 					int index = Integer.parseInt(sb.toString(), 2);
@@ -80,6 +79,7 @@ public class Year2021Day20 extends DayX {
 			}
 			map = updatedmap;
 		}
+
 		cleanMap(map, originalMinX - rounds, originalMaxX + rounds, originalMinY - rounds, originalMaxY + rounds);
 
 		return map.values().stream().filter(i -> i == 1).count();
