@@ -66,13 +66,13 @@ public class Year2021Day21 extends DayX {
 		return Integer.min(score[0], score[1]) * dicerolls;
 	}
 
-	record Wins(long p1wins, long p2wins) {
+	record WinCounts(long p1wins, long p2wins) {
 		public long max() {
 			return Long.max(p1wins, p2wins);
 		}
 
-		public Wins add(Wins other) {
-			return new Wins(this.p1wins + other.p1wins, this.p2wins + other.p2wins);
+		public WinCounts add(WinCounts other) {
+			return new WinCounts(this.p1wins + other.p1wins, this.p2wins + other.p2wins);
 		}
 	}
 
@@ -82,34 +82,24 @@ public class Year2021Day21 extends DayX {
 			return Long.max(p1score, p2score);
 		}
 
-		public GameState inc1andSwitch(int[] board, int turn) {
+		public GameState incPlayer1andSwitchTurn(int[] board, int turn) {
 			return new GameState(p1score + board[turn], p2score, board[0], board[1], !p1turn);
 		}
 
-		public GameState inc2andSwitch(int[] board, int turn) {
+		public GameState incPlayer2andSwitchTurn(int[] board, int turn) {
 			return new GameState(p1score, p2score + board[turn], board[0], board[1], !p1turn);
 		}
 
 	}
 
-	/**
-	 * How many combinations of dice throws causes this player to win.
-	 * 
-	 * @param startState
-	 * @return
-	 */
-	public Wins playAllDiceCombinations(GameState startState) {
-
-		return null;
-	}
-
-	public Wins playAllUniverses(HashMap<GameState, Wins> winsFromState, GameState currentState, int[] boardPosition,
+	public WinCounts playAllUniverses(HashMap<GameState, WinCounts> winsFromState, GameState currentState, int[] boardPosition,
 			int wincondition) {
+		
 		if (winsFromState.containsKey(currentState)) {
 			return winsFromState.get(currentState);
 		}
 
-		Wins result = new Wins(0, 0);
+		WinCounts result = new WinCounts(0, 0);
 
 		int wins = 0;
 		for (int i = 1; i <= 3; i++) {
@@ -124,9 +114,9 @@ public class Year2021Day21 extends DayX {
 					}
 					GameState newState;
 					if (turn == 0)
-						newState = currentState.inc1andSwitch(boardData, turn);
+						newState = currentState.incPlayer1andSwitchTurn(boardData, turn);
 					else {
-						newState = currentState.inc2andSwitch(boardData, turn);
+						newState = currentState.incPlayer2andSwitchTurn(boardData, turn);
 					}
 
 					if (newState.max() >= wincondition) {
@@ -138,12 +128,12 @@ public class Year2021Day21 extends DayX {
 			}
 		}
 		if (currentState.p1turn) {
-			Wins current = new Wins(wins, 0);
+			WinCounts current = new WinCounts(wins, 0);
 			current = current.add(result);
 			winsFromState.put(currentState, current);
 			return current;
 		} else {
-			Wins current = new Wins(0, wins);
+			WinCounts current = new WinCounts(0, wins);
 			current = current.add(result);
 			winsFromState.put(currentState, current);
 			return current;
@@ -163,8 +153,8 @@ public class Year2021Day21 extends DayX {
 			int space = players.get(i).lastIndexOf(' ') + 1;
 			positions[i] = Integer.parseInt(players.get(i).substring(space));
 		}
-		HashMap<GameState, Wins> wins = new HashMap<>();
-		Wins result = playAllUniverses(wins, new GameState(0, 0, positions[0], positions[1], true), positions, 21);
+		HashMap<GameState, WinCounts> wins = new HashMap<>();
+		WinCounts result = playAllUniverses(wins, new GameState(0, 0, positions[0], positions[1], true), positions, 21);
 
 		return result.max();
 	}
