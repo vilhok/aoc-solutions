@@ -21,9 +21,9 @@ import com.github.aoclib.solver.DayX;
  *
  */
 public class Year2022Day02 extends DayX {
-	
-	static final Map<Character, Character> WINS = Map.of('B', 'A', 'A', 'C', 'C', 'B');
-	
+
+	static final Map<Character, Character> WINS = Map.of('A', 'C', 'C', 'B', 'B', 'A');
+
 	/*
 	 * 
 	 */
@@ -33,26 +33,12 @@ public class Year2022Day02 extends DayX {
 
 		for (String s : input.getLines()) {
 			s = s.replace('X', 'A').replace('Y', 'B').replace('Z', 'C');
-			
+
 			char other = s.charAt(0);
 			char me = s.charAt(2);
 
 			points += getPoints(me, other);
 		}
-		return points;
-	}
-
-	public int getPoints(char me, char other) {
-		int points = 0;
-		String games = "_ABC";
-		
-		if (me == other) {
-			points += 3;
-		} else if (WINS.get(me) == other) {
-			points += 6;
-		}
-
-		points += games.indexOf(me);
 		return points;
 	}
 
@@ -79,26 +65,17 @@ public class Year2022Day02 extends DayX {
 		return points;
 	}
 
-	/*
-	 * Optional: add tests for each part in the following methods
-	 *
-	 * These methods have blank implementations in superclass as well and can be
-	 * deleted if you don't want to include tests.
-	 *
-	 * Add test as follows:
-	 *
-	 * new Test("sampleinput", expectedSolution);
-	 *
-	 * Collect the tests from the task web page.
-	 */
+	public int getPoints(char me, char other) {
+		int points = 0;
+		String games = "_ABC";
 
-	@Override
-	protected void insertTestsPart1(List<Test> tests) {
+		if (me == other) {
+			points += 3;
+		} else if (WINS.get(me) == other) {
+			points += 6;
+		}
 
-	}
-
-	@Override
-	protected void insertTestsPart2(List<Test> tests) {
-
+		points += games.indexOf(me);
+		return points;
 	}
 }
