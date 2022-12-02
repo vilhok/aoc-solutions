@@ -27,11 +27,11 @@ public class Year2022Day01 extends DayX {
 	public Object firstPart(InputParser input) {
 		List<List<Integer>> elfgroups = input.getGroups(Integer::parseInt);
 		
-		//java, never change. 
+		//extract list sum to other function to clean up this line
 		return elfgroups.stream().mapToInt(this::sum).max().getAsInt();
 	}
 
-	public int sum(List<Integer> list) {
+	private int sum(List<Integer> list) {
 		return list.stream().mapToInt(i -> i).sum();
 	}
 	
@@ -41,11 +41,9 @@ public class Year2022Day01 extends DayX {
 		List<List<Integer>> elfgroups = input.getGroups(Integer::parseInt);
 
 		List<Integer> li = elfgroups.stream()//
-				.mapToInt(//
-						list -> list.stream().mapToInt(i -> i).sum()//
-				)//
+				.mapToInt(this::sum)//
 				.sorted()//
-				.boxed()//  ah yes.
+				.boxed()//
 				.toList();
 		
 		return li.subList(li.size() - 3, li.size())//
